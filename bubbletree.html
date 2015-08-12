@@ -77,7 +77,7 @@ title: 使途別予算額
 
       //年度変更イベント
       $('#select-year').change(function(){
-//        $('#bubbletree').empty(); // 跡が残るようなので一度削除
+        $('#bubbletree').empty(); // 跡が残るようなので一度削除
 //        newOpenSpendingAggregator(dataLoaded,this.value);
         newOpenSpendingAggregator(dataLoaded,OpenSpending.year);
       });
