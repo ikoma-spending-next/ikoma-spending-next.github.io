@@ -1,5 +1,6 @@
 #ignore vim swap file
 .*.swp
+.ruby*
 .lock-*
 #ignore Desktop Service Store files created by mac
 *.DS_Store
@@ -12,4 +13,3 @@ build/node_modules/*
 _site/*
 .bundle
 vendor
-

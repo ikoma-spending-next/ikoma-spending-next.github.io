@@ -5,6 +5,32 @@ title: トップページ
 
 <script>
 
+function newOpenSpendingAggregator(db,year){
+  new OpenSpending.Aggregator({
+    apiUrl: 'http://openspending.org/api',
+    //localApiCache: 'aggregate.json',
+    dataset: OpenSpending.identifier,
+    drilldowns: ['Category', 'Subcategory'],
+    cuts: ['year:' + year],
+    rootNodeLabel: 'Total',
+    breakdown: 'Subcategory',
+    callback: function(data) {
+      $('#content-wrap').show();
+      $('#preloader').remove();
+      db.setDataFromAggregator(data, ['unknown']);
+      db.setIconLookup(function(name) {
+        var style = OpenSpending.Styles.Cofog[name];
+        if (style != undefined) {
+          return style['icon'];
+        }
+        return 'icons/unknown.svg';
+      });
+      db.draw();
+    }
+  });
+}
+
+
 yepnope({
   load: [
     // 'http://wheredoesmymoneygo.org/wp-content/themes/wdmmg/wdmmg.css',
@@ -21,36 +47,29 @@ yepnope({
   complete: function() {
 
     (function ($) {
-
       $(function () {
+
+        //Optionタグ作成
+        for ( var i = OpenSpending.start_year; i <= OpenSpending.end_year; i++ ) {
+          if ( i == OpenSpending.year ) {
+            $('#select-year').append($('<option>').attr({value:i,selected:'selected'}).text('平成'+(i-1988)+'年度（'+i+'年度)'));
+          } else {
+            $('#select-year').append($('<option>').attr({value:i}).text('平成'+(i-1988)+'年度（'+i+'年度)'));
+          }
+        }
+
 
         $('#preloader .txt').html('loading data');
 
-       var db = new OpenSpending.DailyBread($('#dailybread'));
-       new OpenSpending.Aggregator({
-           apiUrl: 'http://openspending.org/api',
-           //localApiCache: 'aggregate.json',
-           dataset: OpenSpending.identifier,
-           drilldowns: ['Category', 'Subcategory'],
-           cuts: ['year:' + OpenSpending.year],
-           rootNodeLabel: 'Total',
-           breakdown: 'Subcategory',
-           callback: function(data) {
+        // 年度変更時イベント
+        $('#select-year').change(function(){
+//            newOpenSpendingAggregator(db,this.value);
+            newOpenSpendingAggregator(db,OpenSpending.year);
+        })
 
-            $('#content-wrap').show();
-            $('#preloader').remove();
-
-            db.setDataFromAggregator(data, ['unknown']);
-            db.setIconLookup(function(name) {
-              var style = OpenSpending.Styles.Cofog[name];
-              if (style != undefined) {
-               return style['icon'];
-              }
-              return 'icons/unknown.svg';
-            });
-            db.draw();
-           }
-        });
+        // オープン時イベント
+        var db = new OpenSpending.DailyBread($('#dailybread'));
+        newOpenSpendingAggregator(db,OpenSpending.year);
 
         OpenSpending.renderDependentTypes(db);
       });
@@ -65,6 +84,13 @@ yepnope({
   <!--
   <h2 class="page-header">The Daily Bread <small> Costs for the British Taxpayer per Day</small></h2>
   -->
+
+  <div>
+    <h2 style="width:240px;display:inline-block;vertical-align:top;">調べたい年度は？</h2>
+    <select id="select-year">
+    </select>
+  </div>
+
   <div>
     <h2 style="width:240px;display:inline-block;vertical-align:top;">あなたの世帯タイプは？</h2>
     <div id="select-dependents-type" style="width:450px;display:inline-block;">
@@ -96,4 +122,3 @@ yepnope({
   </div>
   あなたの市税は、1日当たり、どこで、いくら使われているでしょうか？
 </div><!-- /#dailybread -->
-

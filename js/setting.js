@@ -11,7 +11,11 @@ Taxes.taxRate = 0.06; // 住民税率
 var OpenSpending = OpenSpending || {};
 
 OpenSpending.identifier = 'ikoma_2013_ippan-kaikei';
-OpenSpending.year = '2013';
+
+// 年度が変わるたびに設定必要
+OpenSpending.year = '2013'; //  今年度
+OpenSpending.start_year = '2012'; // 選択可能な最初の年度
+OpenSpending.end_year = OpenSpending.year;  // 選択可能な最後の年度（＝今年度）
 
 OpenSpending.Styles = OpenSpending.Styles || {};
 
@@ -62,5 +66,3 @@ OpenSpending.Styles.Cofog = {
   '11': { icon: 'icons/japanese-money.svg', color: '#75BA0E', bcolor: '#75BA0E' },
   '11-1': { icon: 'icons/japanese-money.svg', color: '#75BA0E', bcolor: '#75BA0E' },
 };
-
-

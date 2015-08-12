@@ -5,6 +5,21 @@ title: 使途別予算額
 
 <div class="row">
   <script type="text/javascript">
+
+  function newOpenSpendingAggregator(dataLoaded,year){
+    new OpenSpending.Aggregator({
+      apiUrl: 'http://openspending.org/api',
+      //Use static file instead of api
+      //localApiCache: 'aggregate.json',
+      dataset: OpenSpending.identifier,
+      rootNodeLabel: 'Total',
+      drilldowns: ['Category', 'Subcategory'],
+      cuts: ['year:' + year],
+      breakdown: 'Subcategory',
+      callback: dataLoaded
+    });
+  }
+
   yepnope.errorTimeout = 1000;
   yepnope({
   load: [
@@ -23,6 +38,16 @@ title: 使途別予算額
   complete: function() {
 
     $(function() {
+
+      //Optionタグ作成
+      for ( var i = OpenSpending.start_year; i <= OpenSpending.end_year; i++ ) {
+        if ( i == OpenSpending.year ) {
+          $('#select-year').append($('<option>').attr({value:i,selected:'selected'}).text('平成'+(i-1988)+'年度（'+i+'年度)'));
+        } else {
+          $('#select-year').append($('<option>').attr({value:i}).text('平成'+(i-1988)+'年度（'+i+'年度)'));
+        }
+      }
+
       var $tooltip = $('<div class="tooltip">Tooltip</div>');
       $('.bubbletree').append($tooltip);
       $tooltip.hide();
@@ -47,26 +72,26 @@ title: 使途別予算額
         });
       };
 
-      // call openspending api for data
-      new OpenSpending.Aggregator({
-        apiUrl: 'http://openspending.org/api',
-        //Use static file instead of api
-        //localApiCache: 'aggregate.json',
-        dataset: OpenSpending.identifier,
-        rootNodeLabel: 'Total',
-        drilldowns: ['Category', 'Subcategory'],
-        cuts: ['year:' + OpenSpending.year],
-        breakdown: 'Subcategory',
-        callback: dataLoaded
+      // オープン時イベント
+      newOpenSpendingAggregator(dataLoaded,OpenSpending.year);
+
+      //年度変更イベント
+      $('#select-year').change(function(){
+//        $('#bubbletree').empty(); // 跡が残るようなので一度削除
+//        newOpenSpendingAggregator(dataLoaded,this.value);
+        newOpenSpendingAggregator(dataLoaded,OpenSpending.year);
       });
     });
   }
   });
 
   </script>
-
+  <div>
+    <h2 style="width:240px;display:inline-block;vertical-align:top;">調べたい年度は？</h2>
+    <select id="select-year">
+    </select>
+  </div>
   <div class="bubbletree-wrapper">
     <div id="bubbletree" class="bubbletree"></div>
   </div>
 </div>
-
